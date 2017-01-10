@@ -4,6 +4,8 @@ https://github.com/seg/2016-ml-contest/blob/master/index.ipynb
 
 I will be using google's tensorflow library to try a variety of machine learning solutions to the problem. This choice is due to the flexibility and resources available with this library. It is also described as Numpy on steroids which should give some familiarity to myself. 
 The goal is, given a csv file of wells with various measurements at each depth, predict the correct facie value for each depth. 
+
+This readme is an record of the steps taken as I progress through this project.
  
 ## INSTALLATION
 Install on windows using the anaconda package manager. This seems to be the only way to get all the dependencies to work properly. The installation [guide](https://www.tensorflow.org/get_started/os_setup#anaconda_installation) provided by google is reasonable.
