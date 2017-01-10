@@ -22,8 +22,7 @@ y = x.W + b
 
 Where W is the weights and b is the biases. These values are updated each iteration by the regression algorithm. We update by minimizing the cross-entropy between our predicted results y and our actual results y_.
 
-Each iteration is calculated on the entire training set and a halting condition is given when the accuracy difference between 500 iterations has not changed by more than 0.001. 
-The accuracy of our results are defined as the performance of the algorithm in classifying the test set correctly. 
+The accuracy of our results are defined as the performance of the algorithm in classifying the test set correctly ie. y vs y_. 
 
 ### First pass 
 As a first pass the basic MINST tutorial implementation was used. This uses a very basic gradient decent algorithm to calculate the weights. Using the GradientDecentOptimizer to minimize the cross-entropy and a learning rate of 1e-3 produced: **~19%** accuracy with non-convergence.
