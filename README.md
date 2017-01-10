@@ -64,9 +64,10 @@ After reading some more information of the training/test/validation [ratios] (ht
 Using the approximate rule of thumb of:  
 1/sqrt(# inputs) 
 
-There should be 30% test data and 70% training, **not** 20% training and 80% test as I have been using.
+There should be 30% test data and 70% training, **not** 20% training and 80% test as I have been using. With this new ratio we get:
+n1 == 15 @ 1e-3 and 20,000 iterations, **78%**, training set accuracy *84%*.
 
-n1 == 15 @ 1e-3 and 20,000 iterations, **78%**, training set accuracy *84%*. 
+Using a two-layered network:
 n1 == 25, n2 == 15 @1e-3 and 20,000 iterations, **80%**, training set accuracy *85%*.
 
 Now we're getting somewhere! As expected the test accuracy has shot up to be much closer to the training accuracy; we are no longer underfitting. The difference between the test and the training set, combined with the precautions undertaken to randomise the data should mean that we are not overfitting.
