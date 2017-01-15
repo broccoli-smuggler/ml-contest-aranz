@@ -1,25 +1,34 @@
 import pandas as pd
+
+import classification_utilities
 from networks_setups import *
 from sklearn.metrics import confusion_matrix
 
 filename = 'training_data.csv'
 testname = 'facies_vectors.csv'
 
+facies_labels = ['SS', 'CSiS', 'FSiS', 'SiSh', 'MS', 'WS', 'D', 'PS', 'BS']
+adjacent_facies = np.array([[1], [0, 2], [1], [4], [3, 5], [4, 6, 7], [5, 7], [5, 6, 8], [6, 7]])
+
+TRAIN_RATIO = 0.35  # using the rule of thumb of 1/sqrt(num_input_variables)
+
 training_data = pd.read_csv(filename)
 test_data = pd.read_csv(testname)
 
 # Combine and shuffle our data
-all_data = test_data.append(training_data)
+base_data = test_data.append(training_data)
 
-np.random.seed(11)
-rand_index = np.random.permutation(np.arange(all_data.shape[0]))
+np.random.seed(8)
+rand_index = np.random.permutation(np.arange(base_data.shape[0]))
 
 # Split train/test set
-all_data, hot_vals = cleanup_csv(all_data)
+labels_w_noise, base_data = add_input_noise_from_facies(base_data, adjacent_facies, noise_pecentage=0.06)
+all_data = cleanup_csv(base_data)
+
 dev_sample_index = -1 * int(TRAIN_RATIO * float(all_data.shape[0]))
 
-labels_T = tf.convert_to_tensor(hot_vals[:dev_sample_index])
-test_labels_T = tf.convert_to_tensor(hot_vals[dev_sample_index:])
+labels_T = tf.convert_to_tensor(labels_w_noise[:dev_sample_index])
+test_labels_T = tf.convert_to_tensor(labels_w_noise[dev_sample_index:])
 
 # Output data one hot between 1-9. Facies
 y_ = tf.placeholder(tf.float32, shape=[None, NUM_FACIES])
@@ -41,7 +50,7 @@ accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 sess = tf.Session()
 sess.run(tf.global_variables_initializer())
 
-for i in range(20000):
+for i in range(25000):
     x_vals, y_labels, x_vals_t, y_labels_t = sess.run([features_T, labels_T, test_features_T, test_labels_T])
 
     train_data = {x: x_vals, y_: y_labels}
@@ -55,11 +64,24 @@ for i in range(20000):
         print('test acc', test_acc)
         print('train acc', train_acc, '\n')
 
-print('test acc final', test_acc)
-print('train acc final', sess.run(accuracy, feed_dict=train_data), '\n')
+real, predicted = y_labels, sess.run(y, feed_dict=train_data)
+real_t, predicted_t = y_labels_t, sess.run(y, feed_dict=test_data)
 
-# predicted = sess.run(y_, feed_dict=train_data)
-# conf = confusion_matrix(y_labels, predicted)
-# facies_labels = ['SS', 'CSiS', 'FSiS', 'SiSh', 'MS','WS', 'D','PS', 'BS']
-# display_cm(conf, facies_labels, display_metrics=True, hide_zeros=True)
+real = np.argmax(real, axis=1)
+predicted = np.argmax(predicted, axis=1)
+real_t = np.argmax(real_t, axis=1)
+predicted_t = np.argmax(predicted_t, axis=1)
 
+conf = confusion_matrix(real, predicted)
+conf2 = confusion_matrix(real_t, predicted_t)
+
+print("\nModel Report")
+print("-Adjacent Accuracy: %.6f" % (classification_utilities.accuracy_adjacent(conf, adjacent_facies)))
+print("\nConfusion Matrix")
+
+classification_utilities.display_cm(conf, facies_labels, display_metrics=True, hide_zeros=True)
+
+print("\nTEST data")
+print("\nConfusion Matrix")
+print("-Adjacent Accuracy: %.6f" % (classification_utilities.accuracy_adjacent(conf2, adjacent_facies)))
+classification_utilities.display_cm(conf2, facies_labels, display_metrics=True, hide_zeros=True)

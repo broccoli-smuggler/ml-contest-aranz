@@ -3,10 +3,27 @@ import numpy as np
 
 NUM_FACIES = 9
 NUM_INPUTS = 9
-TRAIN_RATIO = 0.30  # using the rule of thumb of 1/sqrt(num_input_variables)
 
 
-def cleanup_csv(data):
+def add_input_noise_from_facies(data, adjacent_facies, noise_pecentage=0.1):
+    noise_dict = {i: k for i, k in enumerate(adjacent_facies)}
+
+    vals = data['Facies'].values
+    vals -= 1
+
+    random_index = np.random.permutation(np.arange(int(len(vals) * noise_pecentage)))
+    to_randomise = vals[random_index]
+    randomed = [np.random.choice(noise_dict[arr]) for arr in to_randomise]
+    vals[random_index] = randomed
+
+    hot_vals = np.zeros((vals.size, vals.max() + 1))
+    hot_vals[np.arange(vals.size), vals] = 1
+    data = data.drop('Facies', axis=1)
+
+    return hot_vals, data
+
+
+def cleanup_csv(data, standardize=True):
     # ** Facies Formation	Well Name	Depth	GR	ILD_log10	DeltaPHI	PHIND	PE	NM_M    RELPOS
     # The well name is not relevant
     data = data.drop('Well Name', axis=1)
@@ -16,17 +33,14 @@ def cleanup_csv(data):
     form_replace = {f: i for f, i in zip(forms, np.arange(len(forms)))}
     data['Formation'] = data['Formation'].replace(form_replace)
 
-    vals = data['Facies'].values
-    vals -= 1
-    hot_vals = np.zeros((vals.size, vals.max() + 1))
-    hot_vals[np.arange(vals.size), vals] = 1
-    data = data.drop('Facies', axis=1)
-
     # Fill missing values and normalize
     data['PE'] = data['PE'].fillna(value=0)
     for name in data:
-        data[name] = (data[name] - data[name].mean()) / data[name].std()
-    return data, hot_vals
+        if standardize:
+            data[name] = (data[name] - data[name].mean()) / data[name].std()
+        else:
+            data[name] = (data[name] - data[name].min()) / (data[name].max() - data[name].min())
+    return data
 
 
 def two_layer_network(all_data, dev_sample_index, dropout=False):
@@ -36,7 +50,7 @@ def two_layer_network(all_data, dev_sample_index, dropout=False):
     test_features_T = tf.pack(all_data.values[dev_sample_index:])
 
     # layer sizes
-    k = 25
+    k = 35
     l = 15
 
     # Weights and biases
@@ -77,7 +91,7 @@ def convolutional_network(all_data, dev_sample_index):
 
     k = 3
     m = 6
-    n = 10
+    n = 25
 
     # of the form [filter-size, input channels, output channels]
 
@@ -93,8 +107,10 @@ def convolutional_network(all_data, dev_sample_index):
 
     y1 = tf.nn.relu(tf.nn.conv1d(c_x, w1, stride=1, padding='SAME') + b1)
     y2 = tf.nn.relu(tf.nn.conv1d(y1, w2, stride=2, padding='SAME') + b2)
+
     yy = tf.reshape(y2, shape=[-1, 5 * m])
     y3 = tf.nn.relu(tf.matmul(yy, w3) + b3)
+
     c_y = tf.matmul(y3, w4) + b4
 
     return c_y, c_x, features_T, test_features_T
