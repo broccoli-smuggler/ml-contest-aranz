@@ -72,5 +72,33 @@ Using a two-layered network:
 n1 == 25, n2 == 15 @1e-3 and 20,000 iterations, **80%**, training set accuracy *85%*.
 
 Now we're getting somewhere! As expected the test accuracy has shot up to be much closer to the training accuracy; we are no longer underfitting. The difference between the test and the training set, combined with the precautions undertaken to randomise the data should mean that we are not overfitting.
- 
+
+### Adding noise to the inputs
+Another improvement to our model an be made through the [injection of noise into out data set] (https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2771718/). This is another form of regularization and again prevents overfitting of the data to the training set. If we can confidently reduce the overfitting it will mean that we can increase the network size and hopefully fit the data more accurately using a deeper network. 
+
+In this particular problem we have a nice source of noise injection: the adjacent facies. In the original tutorial by [Brendon Hall] (https://github.com/seg/2016-ml-contest/blob/master/Facies_classification.ipynb) he gives us some very useful information: 
+
+*" The nine discrete facies (classes of rocks) are:
+Nonmarine sandstone
+Nonmarine coarse siltstone
+Nonmarine fine siltstone
+Marine siltstone and shale
+Mudstone (limestone)
+Wackestone (limestone)
+Dolomite
+Packstone-grainstone (limestone)
+Phylloid-algal bafflestone (limestone)
+These facies aren't discrete, and gradually blend into one another. Some have neighboring facies that are rather close. Mislabeling within these neighboring facies can be expected to occur."*
+
+Using this and the corresponding table we can inject noise into our training data in a reasonable manner. We do this by taking a random sample of the original data (as a percentage eg. 5%) and replace the facies classification with another close facie. 
+
+Using a two-layered network:
+n1 == 25, n2 == 15 @1e-3 and 20,000 iterations, noise @ 5%, **77%**, training set accuracy *74%*.
+
+Well that's very interesting. It seems that our test data is now being fit with greater accuracy than our training data. This seems to be a good indication that we might be on the right track to producing a model with good genrealisaion capabilities. Let's try making a deeper and bigger network to see if we can get the accuracy up now that it seems that our training data set is not being overfitted.
+
+Using a three-layered network:
+n1 == 50, n2 == 35, n3 == 15 @1e-3 and 20,000 iterations, noise @ 5%, **95%**, training set accuracy *89%*.
+
+
  
