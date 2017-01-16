@@ -113,6 +113,7 @@ As we can see the addition of noise does make a reasonably large impact, improvi
 Well now that we seem to be getting a good model with low overfitting, let's just increase the layer sizes and see what happens.
 
 Using a three-layered network (ratio is 35/65% test/train):
+
 n1 == 100, n2 == 55, n3 == 20 @1e-3 and 20,000 iterations, noise @ 5%, **99.8%**, training set accuracy *92%*.
 
 Nice.
