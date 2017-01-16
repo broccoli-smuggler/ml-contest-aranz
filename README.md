@@ -100,5 +100,10 @@ Well that's very interesting. It seems that our test data is now being fit with 
 Using a three-layered network:
 n1 == 50, n2 == 35, n3 == 15 @1e-3 and 20,000 iterations, noise @ 5%, **95%**, training set accuracy *89%*.
 
+n1 == 50, n2 == 35, n3 == 15 @1e-3 and 20,000 iterations, noise @ 10%, **80%**, training set accuracy *70%*.
 
+As a comparison, compare with the three-layered network with no noise:
+n1 == 50, n2 == 35, n3 == 15 @1e-3 and 20,000 iterations, noise @ 0%, **91%**, training set accuracy *88%*.
+
+As we can see the addition of noise does make a reasonably large impact, improving our results when a little is added and conversly if too much is added decreasing the accuracy markadly. 
  
