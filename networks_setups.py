@@ -43,14 +43,14 @@ def cleanup_csv(data, standardize=True):
     return data
 
 
-def two_layer_network(all_data, dev_sample_index, dropout=False):
+def two_layer_network(all_data, sample_index, dropout=False):
     # setup
     l_x = tf.placeholder(tf.float32, shape=[None, NUM_INPUTS])
-    features_T = tf.pack(all_data.values[:dev_sample_index])
-    test_features_T = tf.pack(all_data.values[dev_sample_index:])
+    features_T = tf.pack(all_data.values[:sample_index])
+    test_features_T = tf.pack(all_data.values[sample_index:])
 
     # layer sizes
-    k = 35
+    k = 25
     l = 15
 
     # Weights and biases
@@ -76,14 +76,53 @@ def two_layer_network(all_data, dev_sample_index, dropout=False):
     return l_y, l_x, features_T, test_features_T
 
 
-def convolutional_network(all_data, dev_sample_index):
+def three_layer_network(all_data, sample_index, dropout=False):
+    # setup
+    l_x = tf.placeholder(tf.float32, shape=[None, NUM_INPUTS])
+    features_T = tf.pack(all_data.values[:sample_index])
+    test_features_T = tf.pack(all_data.values[sample_index:])
+
+    # layer sizes
+    k = 50
+    l = 35
+    j = 15
+
+    # Weights and biases
+    w1 = tf.Variable(tf.truncated_normal([NUM_INPUTS, k]))
+    w2 = tf.Variable(tf.truncated_normal([k, l]))
+    w3 = tf.Variable(tf.truncated_normal([l, j]))
+    w4 = tf.Variable(tf.truncated_normal([j, NUM_FACIES]))
+
+    b1 = tf.Variable(tf.zeros([k]))
+    b2 = tf.Variable(tf.zeros([l]))
+    b3 = tf.Variable(tf.zeros([j]))
+    b4 = tf.Variable(tf.zeros([NUM_FACIES]))
+
+    # Regression matrix
+    if dropout:
+        y1d = tf.nn.relu(tf.matmul(l_x, w1) + b1)
+        y1 = tf.nn.dropout(y1d, 0.9)
+        y2d = tf.nn.relu(tf.matmul(y1, w2) + b2)
+        y2 = tf.nn.dropout(y2d, 0.95)
+        y3d = tf.nn.relu(tf.matmul(y2, w3) + b3)
+        y3 = tf.nn.dropout(y3d, 0.95)
+    else:
+        y1 = tf.nn.relu(tf.matmul(l_x, w1) + b1)
+        y2 = tf.nn.relu(tf.matmul(y1, w2) + b2)
+        y3 = tf.nn.relu(tf.matmul(y2, w3) + b3)
+
+    l_y = tf.matmul(y3, w4) + b4
+    return l_y, l_x, features_T, test_features_T
+
+
+def convolutional_network(all_data, sample_index):
     # setup
     c_x = tf.placeholder(tf.float32, shape=[None, NUM_INPUTS, 1])
 
-    f = all_data.values[:dev_sample_index]
+    f = all_data.values[:sample_index]
     f = f[:, :, np.newaxis]
 
-    t = all_data.values[dev_sample_index:]
+    t = all_data.values[sample_index:]
     t = t[:, :, np.newaxis]
 
     features_T = tf.pack(f)

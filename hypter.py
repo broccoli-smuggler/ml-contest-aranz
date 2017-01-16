@@ -22,19 +22,19 @@ np.random.seed(8)
 rand_index = np.random.permutation(np.arange(base_data.shape[0]))
 
 # Split train/test set
-labels_w_noise, base_data = add_input_noise_from_facies(base_data, adjacent_facies, noise_pecentage=0.06)
+labels_w_noise, base_data = add_input_noise_from_facies(base_data, adjacent_facies, noise_pecentage=0.05)
 all_data = cleanup_csv(base_data)
 
-dev_sample_index = -1 * int(TRAIN_RATIO * float(all_data.shape[0]))
+sample_index = -1 * int(TRAIN_RATIO * float(all_data.shape[0]))
 
-labels_T = tf.convert_to_tensor(labels_w_noise[:dev_sample_index])
-test_labels_T = tf.convert_to_tensor(labels_w_noise[dev_sample_index:])
+labels_T = tf.convert_to_tensor(labels_w_noise[:sample_index])
+test_labels_T = tf.convert_to_tensor(labels_w_noise[sample_index:])
 
 # Output data one hot between 1-9. Facies
 y_ = tf.placeholder(tf.float32, shape=[None, NUM_FACIES])
 
 # network setup
-y, x, features_T, test_features_T = two_layer_network(all_data, dev_sample_index)
+y, x, features_T, test_features_T = three_layer_network(all_data, sample_index)
 
 # loss function used to train
 cross_entropy = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(y, y_))
@@ -50,7 +50,7 @@ accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 sess = tf.Session()
 sess.run(tf.global_variables_initializer())
 
-for i in range(25000):
+for i in range(20000):
     x_vals, y_labels, x_vals_t, y_labels_t = sess.run([features_T, labels_T, test_features_T, test_labels_T])
 
     train_data = {x: x_vals, y_: y_labels}
