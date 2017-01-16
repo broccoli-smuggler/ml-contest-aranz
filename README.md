@@ -108,4 +108,12 @@ As a comparison, compare with the three-layered network with no noise:
 n1 == 50, n2 == 35, n3 == 15 @1e-3 and 20,000 iterations, noise @ 0%, **91%**, training set accuracy *88%*.
 
 As we can see the addition of noise does make a reasonably large impact, improving our results when a little is added and conversly if too much is added decreasing the accuracy markadly. 
+
+### Adding more layers
+Well now that we seem to be getting a good model with low overfitting, let's just increase the layer sizes and see what happens.
+
+Using a three-layered network (ratio is 35/65% test/train):
+n1 == 100, n2 == 55, n3 == 20 @1e-3 and 20,000 iterations, noise @ 5%, **99.8%**, training set accuracy *92%*.
+
+Nice.
  
