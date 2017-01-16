@@ -98,6 +98,7 @@ n1 == 25, n2 == 15 @1e-3 and 20,000 iterations, noise @ 5%, **77%**, training se
 Well that's very interesting. It seems that our test data is now being fit with greater accuracy than our training data. This seems to be a good indication that we might be on the right track to producing a model with good genrealisaion capabilities. Let's try making a deeper and bigger network to see if we can get the accuracy up now that it seems that our training data set is not being overfitted.
 
 Using a three-layered network:
+
 n1 == 50, n2 == 35, n3 == 15 @1e-3 and 20,000 iterations, noise @ 5%, **95%**, training set accuracy *89%*.
 
 n1 == 50, n2 == 35, n3 == 15 @1e-3 and 20,000 iterations, noise @ 10%, **80%**, training set accuracy *70%*.
