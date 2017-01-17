@@ -11,6 +11,7 @@ def add_input_noise_from_facies(data, adjacent_facies, noise_pecentage=0.05):
     vals = data['Facies'].values
     vals -= 1
 
+    np.random.seed(8)
     random_index = np.random.permutation(np.arange(int(len(vals) * noise_pecentage)))
     to_randomise = vals[random_index]
     randomed = [np.random.choice(noise_dict[arr]) for arr in to_randomise]
@@ -76,7 +77,7 @@ def two_layer_network(all_data, sample_index, dropout=False):
     return l_y, l_x, features_T, test_features_T
 
 
-def three_layer_network(all_data, sample_index, dropout=False):
+def three_layer_network(all_data, sample_index, seed=None, dropout=False):
     # setup
     l_x = tf.placeholder(tf.float32, shape=[None, NUM_INPUTS])
     features_T = tf.pack(all_data.values[:sample_index])
@@ -88,10 +89,10 @@ def three_layer_network(all_data, sample_index, dropout=False):
     j = 20
 
     # Weights and biases
-    w1 = tf.Variable(tf.truncated_normal([NUM_INPUTS, k]))
-    w2 = tf.Variable(tf.truncated_normal([k, l]))
-    w3 = tf.Variable(tf.truncated_normal([l, j]))
-    w4 = tf.Variable(tf.truncated_normal([j, NUM_FACIES]))
+    w1 = tf.Variable(tf.truncated_normal([NUM_INPUTS, k], seed=seed))
+    w2 = tf.Variable(tf.truncated_normal([k, l], seed=seed))
+    w3 = tf.Variable(tf.truncated_normal([l, j], seed=seed))
+    w4 = tf.Variable(tf.truncated_normal([j, NUM_FACIES], seed=seed))
 
     b1 = tf.Variable(tf.zeros([k]))
     b2 = tf.Variable(tf.zeros([l]))

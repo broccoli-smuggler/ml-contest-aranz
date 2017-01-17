@@ -10,7 +10,7 @@ testname = 'facies_vectors.csv'
 facies_labels = ['SS', 'CSiS', 'FSiS', 'SiSh', 'MS', 'WS', 'D', 'PS', 'BS']
 adjacent_facies = np.array([[1], [0, 2], [1], [4], [3, 5], [4, 6, 7], [5, 7], [5, 6, 8], [6, 7]])
 
-TRAIN_RATIO = 0.35  # using the rule of thumb of 1/sqrt(num_input_variables)
+TRAIN_RATIO = 0.3  # using the rule of thumb of 1/sqrt(num_input_variables)
 
 training_data = pd.read_csv(filename)
 test_data = pd.read_csv(testname)
@@ -30,7 +30,7 @@ hot_vals = np.zeros((vals.size, vals.max() + 1))
 hot_vals[np.arange(vals.size), vals] = 1
 test_labels_T = tf.convert_to_tensor(hot_vals)
 
-labels_w_noise, base_data = add_input_noise_from_facies(base_data, adjacent_facies, noise_pecentage=0.05)
+labels_w_noise, base_data = add_input_noise_from_facies(base_data, adjacent_facies)
 
 all_data = cleanup_csv(base_data)
 labels_T = tf.convert_to_tensor(labels_w_noise[:sample_index])
@@ -39,7 +39,7 @@ labels_T = tf.convert_to_tensor(labels_w_noise[:sample_index])
 y_ = tf.placeholder(tf.float32, shape=[None, NUM_FACIES])
 
 # network setup
-y, x, features_T, test_features_T = three_layer_network(all_data, sample_index)
+y, x, features_T, test_features_T = three_layer_network(all_data, sample_index, seed=10)
 
 # loss function used to train
 cross_entropy = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(y, y_))
