@@ -22,13 +22,18 @@ np.random.seed(8)
 rand_index = np.random.permutation(np.arange(base_data.shape[0]))
 
 # Split train/test set
-labels_w_noise, base_data = add_input_noise_from_facies(base_data, adjacent_facies)
+sample_index = -1 * int(TRAIN_RATIO * float(base_data.shape[0]))
+
+vals = base_data['Facies'].values[sample_index:]
+vals -= 1
+hot_vals = np.zeros((vals.size, vals.max() + 1))
+hot_vals[np.arange(vals.size), vals] = 1
+test_labels_T = tf.convert_to_tensor(hot_vals)
+
+labels_w_noise, base_data = add_input_noise_from_facies(base_data, adjacent_facies, noise_pecentage=0.05)
+
 all_data = cleanup_csv(base_data)
-
-sample_index = -1 * int(TRAIN_RATIO * float(all_data.shape[0]))
-
 labels_T = tf.convert_to_tensor(labels_w_noise[:sample_index])
-test_labels_T = tf.convert_to_tensor(labels_w_noise[sample_index:])
 
 # Output data one hot between 1-9. Facies
 y_ = tf.placeholder(tf.float32, shape=[None, NUM_FACIES])
@@ -50,7 +55,7 @@ accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 sess = tf.Session()
 sess.run(tf.global_variables_initializer())
 
-for i in range(50000):
+for i in range(20000):
     x_vals, y_labels, x_vals_t, y_labels_t = sess.run([features_T, labels_T, test_features_T, test_labels_T])
 
     train_data = {x: x_vals, y_: y_labels}
