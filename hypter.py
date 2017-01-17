@@ -22,7 +22,7 @@ np.random.seed(8)
 rand_index = np.random.permutation(np.arange(base_data.shape[0]))
 
 # Split train/test set
-labels_w_noise, base_data = add_input_noise_from_facies(base_data, adjacent_facies, noise_pecentage=0.05)
+labels_w_noise, base_data = add_input_noise_from_facies(base_data, adjacent_facies)
 all_data = cleanup_csv(base_data)
 
 sample_index = -1 * int(TRAIN_RATIO * float(all_data.shape[0]))
@@ -50,7 +50,7 @@ accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 sess = tf.Session()
 sess.run(tf.global_variables_initializer())
 
-for i in range(20000):
+for i in range(50000):
     x_vals, y_labels, x_vals_t, y_labels_t = sess.run([features_T, labels_T, test_features_T, test_labels_T])
 
     train_data = {x: x_vals, y_: y_labels}
@@ -85,3 +85,14 @@ print("\nTEST data")
 print("\nConfusion Matrix")
 print("-Adjacent Accuracy: %.6f" % (classification_utilities.accuracy_adjacent(conf2, adjacent_facies)))
 classification_utilities.display_cm(conf2, facies_labels, display_metrics=True, hide_zeros=True)
+
+validation = 'validation_data_nofacies.csv'
+validation_data = pd.read_csv(validation)
+v_data = cleanup_csv(validation_data)
+
+final_predictions = sess.run(y, feed_dict={x: v_data.values})
+
+# Get the final predictions and index back to 1-9
+final_predictions = np.argmax(final_predictions, axis=1) + 1
+validation_data['Facies'] = final_predictions
+validation_data.to_csv('ARANZGeo/final_predictions.csv')

@@ -5,7 +5,7 @@ NUM_FACIES = 9
 NUM_INPUTS = 9
 
 
-def add_input_noise_from_facies(data, adjacent_facies, noise_pecentage=0.1):
+def add_input_noise_from_facies(data, adjacent_facies, noise_pecentage=0.05):
     noise_dict = {i: k for i, k in enumerate(adjacent_facies)}
 
     vals = data['Facies'].values
@@ -83,9 +83,9 @@ def three_layer_network(all_data, sample_index, dropout=False):
     test_features_T = tf.pack(all_data.values[sample_index:])
 
     # layer sizes
-    k = 50
-    l = 35
-    j = 15
+    k = 100
+    l = 55
+    j = 20
 
     # Weights and biases
     w1 = tf.Variable(tf.truncated_normal([NUM_INPUTS, k]))
