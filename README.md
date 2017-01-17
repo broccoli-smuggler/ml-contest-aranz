@@ -117,4 +117,8 @@ Using a three-layered network (ratio is 35/65% test/train):
 n1 == 100, n2 == 55, n3 == 20 @1e-3 and 20,000 iterations, noise @ 5%, **99.8%**, training set accuracy *92%*.
 
 Nice.
+
+### Inconsistancy
+Unfortunately, these results are not consistant between runs (even though we are using a random seed to randomize). This is not ideal as we can't validate the robustness of the model and leads to thinking the above result may just be an illusion.
+
  
