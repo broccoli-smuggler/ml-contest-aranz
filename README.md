@@ -119,6 +119,6 @@ n1 == 100, n2 == 55, n3 == 20 @1e-3 and 20,000 iterations, noise @ 5%, **99.8%**
 Nice.
 
 ### Inconsistancy
-Unfortunately, these results are not consistant between runs (even though we are using a random seed to randomize). This is not ideal as we can't validate the robustness of the model and leads to thinking the above result may just be an illusion.
+Unfortunately, these results are not consistant between runs (even though we are using a random seed to randomize). This is becuase our intial weights are randomized (and not seeded currently). As Nueral networks are very sensitive to the intial weighting (espically it seems as we increase the complexity of the network) we get markably different weights on different runs (rather destroying a lot of the comparison that has been done so far between results). To do a real comparison between these meta parameters in this case we need to seed our intial weightings.
 
  
